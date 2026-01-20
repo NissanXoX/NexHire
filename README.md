@@ -197,4 +197,3 @@ docker run -p 5000:5000 --env-file .env nexhire-auth
 **Need Help?** Check the [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed instructions or open an issue.
 
 Happy Coding! 🚀
-"# NexHire" 
