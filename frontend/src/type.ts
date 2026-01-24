@@ -113,6 +113,7 @@ export interface Job {
   posted_by_recuriter_id: number;
   created_at: string;
   is_active: boolean;
+  skills: string[] | null;
 }
 
 export interface Company {
@@ -141,4 +142,15 @@ export interface Application {
   job_title: string;
   job_salary: number;
   job_location: string;
+}
+
+export interface JobCompatibility {
+  compatibilityScore: number;
+  matchLevel: string;
+  matchedSkills: string[];
+  missingSkills: string[];
+  partialMatches: string[];
+  analysis: string;
+  recommendations: string[];
+  nextSteps: string[];
 }

@@ -72,6 +72,24 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             <DollarSign size={18} className="text-green-600" />
             <span>₹ {job.salary} P.A</span>
           </div>
+
+          {job.skills && job.skills.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {job.skills.slice(0, 3).map((skill, index) => (
+                <span
+                  key={index}
+                  className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                >
+                  {skill}
+                </span>
+              ))}
+              {job.skills.length > 3 && (
+                <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                  +{job.skills.length - 3} more
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </CardHeader>
 

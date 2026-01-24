@@ -49,6 +49,15 @@ async function initDB() {
     is_active BOOLEAN DEFAULT true
     )
     `;
+        // Add skills column if it doesn't exist
+        await sql `
+    DO $$
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'jobs' AND column_name = 'skills') THEN
+            ALTER TABLE jobs ADD COLUMN skills TEXT[];
+        END IF;
+    END $$;
+    `;
         await sql `
     CREATE TABLE IF NOT EXISTS applications(
     application_id SERIAL PRIMARY KEY,

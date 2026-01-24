@@ -113,6 +113,7 @@ export const createJob = TryCatch(async (req: AuthenticatedRequest, res) => {
     work_location,
     company_id,
     openings,
+    skills,
   } = req.body;
 
   if (!title || !description || !salary || !location || !role || !openings) {
@@ -127,7 +128,7 @@ export const createJob = TryCatch(async (req: AuthenticatedRequest, res) => {
   }
 
   const [newJob] =
-    await sql`INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings) VALUES (${title}, ${description}, ${salary}, ${location}, ${role}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}) RETURNING *`;
+    await sql`INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings, skills) VALUES (${title}, ${description}, ${salary}, ${location}, ${role}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}, ${skills}) RETURNING *`;
 
   res.json({
     message: "Job posted successfully",
@@ -160,6 +161,7 @@ export const updateJob = TryCatch(async (req: AuthenticatedRequest, res) => {
     company_id,
     openings,
     is_active,
+    skills,
   } = req.body;
 
   const [existingJob] =
@@ -181,7 +183,8 @@ export const updateJob = TryCatch(async (req: AuthenticatedRequest, res) => {
   job_type = ${job_type},
   work_location = ${work_location},
   openings = ${openings},
-  is_active = ${is_active}
+  is_active = ${is_active},
+  skills = ${skills}
   WHERE job_id = ${req.params.jobId} RETURNING *;
   `;
 
@@ -230,7 +233,7 @@ export const getAllActiveJobs = TryCatch(async (req, res) => {
     location?: string;
   };
 
-  let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
+  let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, j.skills, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
 
   const values = [];
 

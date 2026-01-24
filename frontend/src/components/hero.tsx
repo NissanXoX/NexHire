@@ -18,7 +18,7 @@ const Hero = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-background/50 backdrop-blur-sm">
               <TrendingUp size={16} className="text-blue-600" />
               <span className="text-sm font-medium">
-                #1 Job Platform in India
+                #1 Job Platform in Nepal
               </span>
             </div>
 

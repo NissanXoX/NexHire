@@ -37,7 +37,7 @@ const SubscriptionPage = () => {
 
     const options = {
       key: "rzp_test_RaL8PDo9YBejEW", // Replace with your Razorpay key_id
-      amount: order.id, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      amount: order.id, // Amount is in currency subunits. Default currency is NPR. Hence, 50000 refers to 50000 paise
       currency: "NRP",
       name: "NexHire",
       description: "Find job easily",
@@ -87,7 +87,7 @@ const SubscriptionPage = () => {
         <p className="text-sm opacity-70 mb-6">Boost your job search</p>
 
         <div className="mb-6">
-          <p className="text-5xl font-bold text-blue-600">₹ 119</p>
+          <p className="text-5xl font-bold text-blue-600">NPR 119</p>
           <p className="text-sm opacity-60 mt-1">Per month</p>
         </div>
 

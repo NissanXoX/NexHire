@@ -216,4 +216,84 @@ Focus on: - File format and structure compatibility - Proper use of standard sec
   }
 });
 
+router.post("/job-compatibility", async (req, res) => {
+  try {
+    const { jobSkills, userSkills } = req.body;
+
+    if (!jobSkills || !userSkills) {
+      return res.status(400).json({
+        message: "Both job skills and user skills are required",
+      });
+    }
+
+    const prompt = `
+You are an expert career counselor and job matching specialist. Analyze the compatibility between a job seeker's skills and the skills required for a specific job position.
+
+Job Required Skills: ${Array.isArray(jobSkills) ? jobSkills.join(", ") : jobSkills}
+User's Skills: ${Array.isArray(userSkills) ? userSkills.join(", ") : userSkills}
+
+Please provide a detailed compatibility analysis. Your entire response must be in valid JSON format. Do not include any text or markdown formatting outside of the JSON structure.
+
+The JSON object should have the following structure:
+{
+  "compatibilityScore": 75,
+  "matchLevel": "Good Match",
+  "matchedSkills": ["JavaScript", "React", "Node.js"],
+  "missingSkills": ["TypeScript", "MongoDB"],
+  "partialMatches": ["Python (basic knowledge)"],
+  "analysis": "A detailed 2-3 paragraph analysis explaining the compatibility score, strengths, and areas for improvement",
+  "recommendations": [
+    "Specific actionable recommendations for the user to improve their compatibility",
+    "Suggestions for skill development or experience building"
+  ],
+  "nextSteps": [
+    "Immediate actions the user should take",
+    "Long-term career development suggestions"
+  ]
+}
+
+Consider:
+- Exact skill matches (highest weight)
+- Related or transferable skills
+- Skill level requirements vs user's proficiency
+- Industry relevance
+- Technical vs soft skills balance
+- Growth potential and learning ability
+
+Match levels should be: "Excellent Match" (90-100), "Good Match" (70-89), "Moderate Match" (50-69), "Low Match" (30-49), "Poor Match" (0-29)
+`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+
+    let jsonResponse;
+
+    try {
+      const rawText = response.text
+        ?.replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+      if (!rawText) {
+        throw new Error("AI did not return a valid text response.");
+      }
+
+      jsonResponse = JSON.parse(rawText);
+    } catch (error) {
+      return res.status(500).json({
+        message: "AI returned response that was not valid JSON",
+        rawResponse: response.text,
+      });
+    }
+
+    res.json(jsonResponse);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
 export default router;

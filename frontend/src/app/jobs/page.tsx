@@ -20,14 +20,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 const locations: string[] = [
-  "Delhi",
-  "Mumbai",
-  "Banglore",
-  "Hyderabad",
-  "Pune",
-  "Kolkata",
-  "Chennai",
-  "Remote",
+  "Kathmandu",
+  "Dharan",
+  "Biratnagar",
+  "Lalitpur",
+  "Pokhara",
+  "Bhaktapur",
+  "Chitwan",
+  "Rupandehi",
 ];
 
 const JobsPage = () => {

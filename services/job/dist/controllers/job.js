@@ -56,7 +56,7 @@ export const createJob = TryCatch(async (req, res) => {
     if (user.role !== "recruiter") {
         throw new ErrorHandler(403, "Forbidden: Only recruiter can create a company");
     }
-    const { title, description, salary, location, role, job_type, work_location, company_id, openings, } = req.body;
+    const { title, description, salary, location, role, job_type, work_location, company_id, openings, skills, } = req.body;
     if (!title || !description || !salary || !location || !role || !openings) {
         throw new ErrorHandler(400, "All the fields required");
     }
@@ -64,7 +64,7 @@ export const createJob = TryCatch(async (req, res) => {
     if (!company) {
         throw new ErrorHandler(404, "Company not found");
     }
-    const [newJob] = await sql `INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings) VALUES (${title}, ${description}, ${salary}, ${location}, ${role}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}) RETURNING *`;
+    const [newJob] = await sql `INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings, skills) VALUES (${title}, ${description}, ${salary}, ${location}, ${role}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}, ${skills}) RETURNING *`;
     res.json({
         message: "Job posted successfully",
         job: newJob,
@@ -78,7 +78,7 @@ export const updateJob = TryCatch(async (req, res) => {
     if (user.role !== "recruiter") {
         throw new ErrorHandler(403, "Forbidden: Only recruiter can create a company");
     }
-    const { title, description, salary, location, role, job_type, work_location, company_id, openings, is_active, } = req.body;
+    const { title, description, salary, location, role, job_type, work_location, company_id, openings, is_active, skills, } = req.body;
     const [existingJob] = await sql `SELECT posted_by_recuriter_id FROM jobs WHERE job_id = ${req.params.jobId}`;
     if (!existingJob) {
         throw new ErrorHandler(404, "Job not found");
@@ -94,7 +94,8 @@ export const updateJob = TryCatch(async (req, res) => {
   job_type = ${job_type},
   work_location = ${work_location},
   openings = ${openings},
-  is_active = ${is_active}
+  is_active = ${is_active},
+  skills = ${skills}
   WHERE job_id = ${req.params.jobId} RETURNING *;
   `;
     res.json({
@@ -125,7 +126,7 @@ export const getCompanyDetails = TryCatch(async (req, res) => {
 });
 export const getAllActiveJobs = TryCatch(async (req, res) => {
     const { title, location } = req.query;
-    let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
+    let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, j.skills, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
     const values = [];
     let paramIndex = 1;
     if (title) {

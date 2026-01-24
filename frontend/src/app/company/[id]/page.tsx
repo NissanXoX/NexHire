@@ -88,6 +88,7 @@ const CompanyPage = () => {
   const [openings, setopenings] = useState("");
   const [job_type, setjob_type] = useState("");
   const [work_location, setwork_location] = useState("");
+  const [skills, setskills] = useState<string[]>([]);
   const [is_active, setis_active] = useState(true);
 
   const clearInput = () => {
@@ -99,6 +100,7 @@ const CompanyPage = () => {
     setopenings("");
     setjob_type("");
     setwork_location("");
+    setskills([]);
     setis_active(true);
   };
 
@@ -115,6 +117,7 @@ const CompanyPage = () => {
         job_type,
         work_location,
         company_id: id,
+        skills,
       };
 
       await axios.post(`${job_service}/api/job/new`, jobData, {
@@ -165,6 +168,7 @@ const CompanyPage = () => {
     setopenings(String(job.openings));
     setjob_type(job.job_type);
     setwork_location(job.work_location);
+    setskills(job.skills || []);
     setis_active(job.is_active);
     setIsUpdatedModalOpen(true);
   };
@@ -190,6 +194,7 @@ const CompanyPage = () => {
         job_type,
         work_location,
         is_active,
+        skills,
       };
 
       await axios.put(
@@ -388,6 +393,23 @@ const CompanyPage = () => {
                         />
                       </div>
 
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="skills"
+                          className="text-sm font-medium flex items-center gap-2"
+                        >
+                          <Briefcase size={16} /> Required Skills
+                        </Label>
+                        <Input
+                          id="skills"
+                          type="text"
+                          placeholder="Enter skills separated by commas (e.g., JavaScript, React, Node.js)"
+                          className="h-11"
+                          value={skills.join(", ")}
+                          onChange={(e) => setskills(e.target.value.split(",").map(s => s.trim()).filter(s => s))}
+                        />
+                      </div>
+
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label
@@ -516,6 +538,12 @@ const CompanyPage = () => {
                                 <Users size={16} />
                                 <span>{j.openings} openings</span>
                               </div>
+                              {j.skills && j.skills.length > 0 && (
+                                <div className="flex items-center gap-2 opacity-70">
+                                  <Briefcase size={16} />
+                                  <span>Skills: {j.skills.join(", ")}</span>
+                                </div>
+                              )}
                             </div>
                           </div>
 
