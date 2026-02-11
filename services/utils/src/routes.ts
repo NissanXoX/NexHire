@@ -87,20 +87,31 @@ Mastery', 'DevOps & Cloud').",
     let jsonResponse;
 
     try {
-      const rawText = response.text
-        ?.replace(/```json/g, "")
-        .replace(/```/g, "")
-        .trim();
+      let rawText = response.text?.trim() || "";
+
+      // Remove common code fences
+      rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
 
       if (!rawText) {
-        throw new Error("Ai did not return a valid text response.");
+        throw new Error("AI did not return a valid text response.");
+      }
+
+      // If the AI included text around the JSON, try to extract the JSON object
+      if (!rawText.startsWith("{")) {
+        const firstBrace = rawText.indexOf("{");
+        const lastBrace = rawText.lastIndexOf("}");
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          rawText = rawText.substring(firstBrace, lastBrace + 1);
+        }
       }
 
       jsonResponse = JSON.parse(rawText);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Failed to parse AI response for career endpoint:", response.text, error.message);
       return res.status(500).json({
-        message: "Ai returned response that was not valid JSON",
+        message: "AI returned response that was not valid JSON",
         rawResponse: response.text,
+        error: error.message,
       });
     }
 
@@ -191,20 +202,29 @@ Focus on: - File format and structure compatibility - Proper use of standard sec
     let jsonResponse;
 
     try {
-      const rawText = response.text
-        ?.replace(/```json/g, "")
-        .replace(/```/g, "")
-        .trim();
+      let rawText = response.text?.trim() || "";
+
+      rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
 
       if (!rawText) {
-        throw new Error("Ai did not return a valid text response.");
+        throw new Error("AI did not return a valid text response.");
+      }
+
+      if (!rawText.startsWith("{")) {
+        const firstBrace = rawText.indexOf("{");
+        const lastBrace = rawText.lastIndexOf("}");
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          rawText = rawText.substring(firstBrace, lastBrace + 1);
+        }
       }
 
       jsonResponse = JSON.parse(rawText);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Failed to parse AI response for resume-analyser endpoint:", response.text, error.message);
       return res.status(500).json({
-        message: "Ai returned response that was not valid JSON",
+        message: "AI returned response that was not valid JSON",
         rawResponse: response.text,
+        error: error.message,
       });
     }
 
@@ -271,20 +291,29 @@ Match levels should be: "Excellent Match" (90-100), "Good Match" (70-89), "Moder
     let jsonResponse;
 
     try {
-      const rawText = response.text
-        ?.replace(/```json/g, "")
-        .replace(/```/g, "")
-        .trim();
+      let rawText = response.text?.trim() || "";
+
+      rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
 
       if (!rawText) {
         throw new Error("AI did not return a valid text response.");
       }
 
+      if (!rawText.startsWith("{")) {
+        const firstBrace = rawText.indexOf("{");
+        const lastBrace = rawText.lastIndexOf("}");
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          rawText = rawText.substring(firstBrace, lastBrace + 1);
+        }
+      }
+
       jsonResponse = JSON.parse(rawText);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Failed to parse AI response for job-compatibility endpoint:", response.text, error.message);
       return res.status(500).json({
         message: "AI returned response that was not valid JSON",
         rawResponse: response.text,
+        error: error.message,
       });
     }
 
