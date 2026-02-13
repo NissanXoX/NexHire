@@ -135,6 +135,7 @@ export interface Application {
   job_id: number;
   applicant_id: number;
   applicant_email: string;
+  applicant_name?: string;
   status: ApplicationStatus;
   resume: string;
   applied_at: string;
@@ -142,6 +143,8 @@ export interface Application {
   job_title: string;
   job_salary: number;
   job_location: string;
+  compatibility_score?: number;
+  compatibility_label?: string;
 }
 
 export interface JobCompatibility {

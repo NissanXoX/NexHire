@@ -40,6 +40,7 @@ const JobPage = () => {
   const [jobApplications, setJobApplications] = useState<Application[]>([]);
   const [filterStatus, setFilterStatus] = useState("All");
   const [value, setValue] = useState("");
+  const [sortOrder, setSortOrder] = useState("none"); // none | high | low
 
   const token = Cookies.get("token");
 
@@ -319,49 +320,89 @@ const JobPage = () => {
                     <option value="Hired">Hired</option>
                     <option value="Rejected">Rejected</option>
                   </select>
+                  <label htmlFor="sort-order" className="text-sm font-medium">Sort:</label>
+                  <select
+                    id="sort-order"
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="p-2 border-2 border-gray-300 rounded-md bg-background"
+                  >
+                    <option value="none">Default</option>
+                    <option value="high">Compatibility: High → Low</option>
+                    <option value="low">Compatibility: Low → High</option>
+                  </select>
                 </div>
 
                 {jobApplications.length > 0 ? (
-                  filteredApplications.map((app) => (
-                    <Card key={app.application_id} className="mb-4 p-4 border-2">
-                      <div className="flex justify-between items-center mb-2">
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            app.status === "Hired"
-                              ? "bg-green-100 dark:bg-green-900/30 text-green-600"
-                              : app.status === "Rejected"
-                              ? "bg-red-100 dark:bg-red-900/30 text-red-600"
-                              : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600"
-                          }`}
-                        >
-                          {app.status}
-                        </span>
-                      </div>
+                  // apply sorting by compatibility score if requested
+                  (() => {
+                    const apps = [...filteredApplications];
+                    if (sortOrder === "high") apps.sort((a, b) => (b.compatibility_score || 0) - (a.compatibility_score || 0));
+                    else if (sortOrder === "low") apps.sort((a, b) => (a.compatibility_score || 0) - (b.compatibility_score || 0));
+                    return apps.map((app) => (
+                      <Card key={app.application_id} className="mb-4 p-6 border-2 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="flex justify-between items-start mb-6 gap-4">
+                          <div className="flex-1">
+                            <h3 className="font-bold text-2xl mb-2">{app.applicant_name || "Applicant"}</h3>
+                            <p className="text-sm opacity-60">{app.applicant_email}</p>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            <div className="text-right">
+                              <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">{app.compatibility_score ?? "N/A"}%</div>
+                              <p className="text-xs font-medium opacity-60 mt-1">Match Score</p>
+                              {app.compatibility_label && (
+                                <p className={`text-sm font-semibold mt-2 px-3 py-1 rounded-lg inline-block ${
+                                  app.compatibility_score >= 80
+                                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                                    : app.compatibility_score >= 50
+                                    ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                                    : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                                }`}>
+                                  {app.compatibility_label}
+                                </p>
+                              )}
+                            </div>
+                            <span
+                              className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${
+                                app.status === "Hired"
+                                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                                  : app.status === "Rejected"
+                                  ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                                  : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                              }`}
+                            >
+                              {app.status}
+                            </span>
+                          </div>
+                        </div>
 
-                      <div className="flex gap-3 mb-3">
-                        <Link target="_blank" href={app.resume} className="text-blue-500 hover:underline text-sm">
-                          View Resume
-                        </Link>
-                        <Link target="_blank" href={`/account/${app.applicant_id}`} className="text-blue-500 hover:underline text-sm">
-                          View Profile
-                        </Link>
-                      </div>
+                        <div className="flex gap-6 mb-6 text-sm">
+                          <Link target="_blank" href={app.resume} className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors">
+                            📄 View Resume
+                          </Link>
+                          <Link target="_blank" href={`/account/${app.applicant_id}`} className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors">
+                            👤 View Profile
+                          </Link>
+                        </div>
 
-                      <div className="flex gap-2 pt-3 border-t">
-                        <select
-                          value={value}
-                          onChange={(e) => setValue(e.target.value)}
-                          className="flex-1 p-2 border-2 border-gray-300 rounded-md bg-background"
-                        >
-                          <option value="">Update status</option>
-                          <option value="Submitted">Submitted</option>
-                          <option value="Hired">Hired</option>
-                          <option value="Rejected">Rejected</option>
-                        </select>
-                        <Button disabled={btnLoading} onClick={() => updateApplicationHandler(app.application_id)}>Update</Button>
-                      </div>
-                    </Card>
-                  ))
+                        <div className="flex gap-3 pt-6 border-t">
+                          <select
+                            value={value}
+                            onChange={(e) => setValue(e.target.value)}
+                            className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg bg-background font-medium text-sm"
+                          >
+                            <option value="">Update status</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Hired">Hired</option>
+                            <option value="Rejected">Rejected</option>
+                          </select>
+                          <Button disabled={btnLoading} onClick={() => updateApplicationHandler(app.application_id)} className="px-6 font-semibold">
+                            {btnLoading ? "Updating..." : "Update"}
+                          </Button>
+                        </div>
+                      </Card>
+                    ));
+                  })()
                 ) : (
                   <p className="text-center opacity-70 py-8">No applications yet.</p>
                 )}

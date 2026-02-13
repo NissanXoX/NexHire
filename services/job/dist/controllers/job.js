@@ -5,6 +5,7 @@ import ErrorHandler from "../utils/errorHandler.js";
 import { TryCatch } from "../utils/TryCatch.js";
 import { applicationStatusUpdateTemplate } from "../tempelete.js";
 import { publishToTopic } from "../producer.js";
+import { computeCompatibility } from "../utils/ai.js";
 export const createCompany = TryCatch(async (req, res) => {
     const user = req.user;
     if (!user) {
@@ -165,8 +166,32 @@ export const getAllApplicationForJob = TryCatch(async (req, res) => {
     if (job.posted_by_recuriter_id !== user.user_id) {
         throw new ErrorHandler(403, "Forbidden you are not allowed");
     }
-    const applications = await sql `SELECT * FROM applications WHERE job_id = ${jobId} ORDER BY subscribed DESC, applied_at ASC`;
-    res.json(applications);
+    // fetch job required skills (jobs.skills is a TEXT[] column)
+    const [jobData] = await sql `SELECT skills FROM jobs WHERE job_id = ${jobId}`;
+    const jobSkills = (jobData && jobData.skills) || [];
+    const applications = await sql `SELECT a.*, u.name as applicant_name FROM applications a LEFT JOIN users u ON a.applicant_id = u.user_id WHERE a.job_id = ${jobId} ORDER BY a.subscribed DESC, a.applied_at ASC`;
+    // compute compatibility score per applicant (AI if configured, otherwise simple overlap)
+    const enhancedApplications = await Promise.all(applications.map(async (app) => {
+        const [row] = await sql `
+          SELECT ARRAY_AGG(s.name) AS skills
+          FROM user_skills us
+          JOIN skills s ON us.skill_id = s.skill_id
+          WHERE us.user_id = ${app.applicant_id}
+        `;
+        const applicantSkills = (row && row.skills) || [];
+        const score = await computeCompatibility(jobSkills, applicantSkills, "");
+        let label = "Low compatibility";
+        if (score >= 80)
+            label = "Highly compatible";
+        else if (score >= 50)
+            label = "Compatible";
+        return {
+            ...app,
+            compatibility_score: score,
+            compatibility_label: label,
+        };
+    }));
+    res.json(enhancedApplications);
 });
 export const updateApplication = TryCatch(async (req, res) => {
     const user = req.user;

@@ -1,9 +1,20 @@
 import app from "./app.js";
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import { sql } from "./utils/db.js";
 import { connectKafka } from "./producer.js";
 
-dotenv.config();
+// Prefer shared env at services/utils/.env, fallback to default .env
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const sharedEnv = path.resolve(__dirname, "..", "..", "utils", ".env");
+if (fs.existsSync(sharedEnv)) {
+  dotenv.config({ path: sharedEnv });
+} else {
+  dotenv.config();
+}
 
 connectKafka();
 
