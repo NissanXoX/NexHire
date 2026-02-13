@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { Briefcase, Home, Info, LogOut, Menu, User, X } from "lucide-react";
+import { Briefcase, Home, Info, LogOut, Menu, Sparkles, User, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./mode-toggle";
@@ -64,6 +64,15 @@ const NavBar = () => {
                 <Info size={16} /> About
               </Button>
             </Link>
+
+            <a href="https://mock-ai-yrgl.vercel.app/sign-in" target="_blank" rel="noopener noreferrer">
+              <Button
+                variant={"ghost"}
+                className="flex items-center gap-2 font-medium"
+              >
+                <Sparkles size={16} /> PrepAI
+              </Button>
+            </a>
           </div>
 
           {/* Right side Actions */}
@@ -179,6 +188,15 @@ const NavBar = () => {
               <Info size={18} /> About
             </Button>
           </Link>
+
+          <a href="https://mock-ai-yrgl.vercel.app/sign-in" target="_blank" rel="noopener noreferrer" onClick={toggleMenu}>
+            <Button
+              variant={"ghost"}
+              className="w-full justify-start gap-3 h-11"
+            >
+              <Sparkles size={18} /> PrepAI
+            </Button>
+          </a>
 
           {isAuth ? (
             <>
