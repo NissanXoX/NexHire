@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'bot' }[]>([
-    { text: "Hi! I'm NexHire's assistant powered by Google Gemini. How can I help you today?", sender: 'bot' },
+    { text: "Hi! I'm NexHire's assistant bot. How can I help you today?", sender: 'bot' },
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);

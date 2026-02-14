@@ -70,37 +70,59 @@ const JobsPage = () => {
   const clearFilter = () => {
     setTitle("");
     setLocation("");
-    fetchJobs();
     ref.current?.click();
   };
 
   const hasActiveFilters = title || location;
+
   return (
     <div className="min-h-screen bg-secondary/30">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header Section */}
+
+        {/* HEADER */}
         <div className="mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                Explore <span className="text-red-500">Oppertunities</span>
+                Explore <span className="text-red-500">Opportunities</span>
               </h1>
               <p className="text-base opacity-70">{jobs.length} jobs</p>
             </div>
 
-            <Button className="gap-2 h-11" onClick={clickEvent}>
-              <Filter size={18} /> Filters
-              {hasActiveFilters && (
-                <span className="ml-1 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs">
-                  Active
-                </span>
-              )}
-            </Button>
+            {/* ✅ NEW SEARCH BAR */}
+            <div className="flex gap-3 w-full md:w-auto">
+              <div className="relative w-full md:w-80">
+                <Search
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50"
+                />
+                <Input
+                  type="text"
+                  placeholder="Search jobs..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="pl-10 h-11"
+                />
+              </div>
+
+              <Button className="gap-2 h-11" onClick={clickEvent}>
+                <Filter size={18} /> Filters
+                {hasActiveFilters && (
+                  <span className="ml-1 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs">
+                    Active
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
 
+          {/* ACTIVE FILTER TAGS */}
           {hasActiveFilters && (
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap mb-4">
               <span className="text-sm opacity-70">Active Filters:</span>
+
               {title && (
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 text-sm">
                   <Search size={14} />
@@ -129,28 +151,26 @@ const JobsPage = () => {
             </div>
           )}
 
+          {/* JOB GRID */}
           {loading ? (
             <Loading />
+          ) : jobs && jobs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {jobs.map((job) => (
+                <JobCard job={job} key={job.job_id} />
+              ))}
+            </div>
           ) : (
-            <>
-              {jobs && jobs.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {jobs.map((job) => (
-                    <JobCard job={job} key={job.job_id} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
-                    <Briefcase size={40} className="opacity-40" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">No Jobs found</h3>
-                </div>
-              )}
-            </>
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
+                <Briefcase size={40} className="opacity-40" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">No Jobs found</h3>
+            </div>
           )}
         </div>
 
+        {/* FILTER DIALOG */}
         <Dialog>
           <DialogTrigger asChild>
             <Button ref={ref} className="hidden"></Button>
@@ -166,17 +186,13 @@ const JobsPage = () => {
 
             <div className="space-y-5 py-4">
               <div className="space-y-2">
-                <Label
-                  htmlFor="title"
-                  className="text-sm font-medium flex items-center gap-2"
-                >
+                <Label className="text-sm font-medium flex items-center gap-2">
                   <Search size={16} />
                   Search by job title
                 </Label>
                 <Input
-                  id="title"
                   type="text"
-                  placeholder="Enter company name"
+                  placeholder="Enter job title"
                   className="h-11"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -184,18 +200,14 @@ const JobsPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label
-                  htmlFor="location"
-                  className="text-sm font-medium flex items-center gap-2"
-                >
+                <Label className="text-sm font-medium flex items-center gap-2">
                   <MapPin size={16} />
                   Location
                 </Label>
                 <select
-                  id="location"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full h-11 px-3 border-2 border-gray-300 rounded-md bg-transparent focus:outline-none focus:ring2"
+                  className="w-full h-11 px-3 border-2 border-gray-300 rounded-md bg-transparent"
                 >
                   <option value="">All Locations</option>
                   {locations.map((e) => (
